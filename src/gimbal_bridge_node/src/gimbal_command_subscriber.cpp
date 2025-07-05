@@ -125,8 +125,31 @@ gimbal_camera_state_bridge gimbal_bridge(SERVER_IP, SERVER_PORT);
 void gimbal_cmd_callback(const gimbal_bridge_node::GimbalCmd::ConstPtr &msg)
 {
     // 打印接收到的命令信息
-    ROS_INFO("Received Gimbal Command: yaw=%.2f, pitch=%.2f, json_string=%s",
-             msg->yaw, msg->pitch, msg->json_string.c_str());
+    ROS_INFO("Received Gimbal Command: yaw=%.2f, pitch=%.2f, gimbal_state_machine = %d, json_string=%s",
+             msg->yaw, msg->pitch, msg->gimbal_state_machine, msg->json_string.c_str());
+    if (msg->gimbal_state_machine < 0 || msg->gimbal_state_machine > 2)
+    {
+        ROS_ERROR("Invalid gimbal state machine value: %d. It must be 0, 1, or 2.", msg->gimbal_state_machine);
+        return;
+    }
+    gimbal_bridge_node::GimbalCmd gimbal_cmd = *msg;
+
+    if (msg->gimbal_state_machine == 0)
+    {
+        // 云台状态机为0时，云台指向前下方（pitch = 45， yaw=0）
+        ROS_INFO("Gimbal is set to point forward downwards (pitch=45, yaw=0).");
+        gimbal_cmd.pitch = 45;
+        gimbal_cmd.yaw = 0;
+        return;
+    }
+    else if (msg->gimbal_state_machine == 1)
+    {
+        // 云台状态机为1时，云台指向正下方（pitch=90，yaw=0）
+        ROS_INFO("Gimbal is set to point directly downwards (pitch=90, yaw=0).");
+        gimbal_cmd.pitch = 90;
+        gimbal_cmd.yaw = 0;
+        return;
+    }
     // 这里仅仅进行有效性判断，平滑性等更高层次的要求交给控制器进行处理。
     if (msg->yaw < -135 || msg->yaw > 135 ||
         msg->pitch < -90 || msg->pitch > 25)
@@ -134,7 +157,7 @@ void gimbal_cmd_callback(const gimbal_bridge_node::GimbalCmd::ConstPtr &msg)
         ROS_ERROR("Invalid gimbal command: yaw or pitch out of range.");
         return;
     }
-    if (!gimbal_bridge.execute_command(*msg))
+    if (!gimbal_bridge.execute_command(gimbal_cmd))
     {
         ROS_ERROR("Failed to execute gimbal command.");
     }

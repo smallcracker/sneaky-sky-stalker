@@ -7,7 +7,7 @@ import time
 def publish_gimbal_cmd():
     pub = rospy.Publisher('/gimbal/cmd', GimbalCmd, queue_size=10)
     rospy.init_node('gimbal_cmd_publisher')
-    rate = rospy.Rate(20)  # 20Hz 发布频率
+    rate = rospy.Rate(20)  # 5Hz 发布频率
 
     # 初始化变量
     start_time = rospy.Time.now().to_sec()  # 获取当前时间（秒）
@@ -28,14 +28,18 @@ def publish_gimbal_cmd():
 
         # 创建并发布消息
         msg = GimbalCmd()
+        if math.fmod(current_time-start_time, 10) < 5:
+            msg.gimbal_state_machine = 0
+        else:
+            msg.gimbal_state_machine = 1
         msg.yaw = yaw
         msg.pitch = pitch
         msg.json_string = '{"status":"normal"}'
         pub.publish(msg)
 
         # 打印日志
-        rospy.loginfo("Published: yaw=%.1f, pitch=%.1f, json=%s", 
-                      msg.yaw, msg.pitch, msg.json_string)
+        rospy.loginfo("Published: yaw=%.1f, pitch=%.1f, state = %d, json=%s",
+                      msg.yaw, msg.pitch, msg.gimbal_state_machine, msg.json_string)
 
         # 等待下一个周期
         rate.sleep()

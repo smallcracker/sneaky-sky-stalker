@@ -95,10 +95,10 @@ public:
         ROS_INFO("Zoom Firmware Version: %u", response.zoom_firmware_ver);
     }
 
-    void set_func_mode()
+    void set_func_mode(FunctionType mode)
     {
         uint8_t send_buf[RECV_BUF_SIZE] = {0};
-        uint16_t request_length = siyi_pack_function_control(send_buf, RECV_BUF_SIZE, FUNC_MODE_FOLLOW, 0x0000);
+        uint16_t request_length = siyi_pack_function_control(send_buf, RECV_BUF_SIZE, mode, 0x0000);
         if (request_length == 0)
         {
             ROS_ERROR("Failed to pack request data");
@@ -196,12 +196,27 @@ public:
         return true;
     }
 
+    int get_state_machine() const
+    {
+        return state_machine;
+    }
+    void set_state_machine(int state)
+    {
+        if (state < 0 || state > 2)
+        {
+            ROS_ERROR("Invalid gimbal state machine value: %d. It must be 0, 1, or 2.", state);
+            return;
+        }
+        state_machine = state;
+    }
+
 private:
     static constexpr int RECV_BUF_SIZE = 64;
     std::string server_ip_;
     uint16_t server_port_;
     struct sockaddr_in send_addr_;
     int sockfd;
+    int state_machine = 0; // 云台状态机，0:前下方，1:正下方，2:自由控制
 };
 
 // 初始化云台桥接类
@@ -210,16 +225,56 @@ gimbal_camera_state_bridge gimbal_bridge(SERVER_IP, SERVER_PORT);
 void gimbal_cmd_callback(const gimbal_bridge_node::GimbalCmd::ConstPtr &msg)
 {
     // 打印接收到的命令信息
-    ROS_INFO("Received Gimbal Command: yaw=%.2f, pitch=%.2f, json_string=%s",
-             msg->yaw, msg->pitch, msg->json_string.c_str());
-    // 这里仅仅进行有效性判断，平滑性等更高层次的要求交给控制器进行处理。
-    if (msg->yaw < -135 || msg->yaw > 135 ||
-        msg->pitch < -90 || msg->pitch > 25)
+    ROS_INFO("Received Gimbal Command: yaw=%.2f, pitch=%.2f, gimbal_state_machine = %d, json_string=%s",
+             msg->yaw, msg->pitch, msg->gimbal_state_machine, msg->json_string.c_str());
+    if (msg->gimbal_state_machine < 0 || msg->gimbal_state_machine > 2)
     {
-        ROS_ERROR("Invalid gimbal command: yaw or pitch out of range.");
+        ROS_ERROR("Invalid gimbal state machine value: %d. It must be 0, 1, or 2.", msg->gimbal_state_machine);
         return;
     }
-    if (!gimbal_bridge.execute_command(*msg))
+    gimbal_bridge_node::GimbalCmd gimbal_cmd = *msg;
+    ROS_INFO("gimbal bridge state machine: %d", gimbal_bridge.get_state_machine());
+
+    if ((gimbal_cmd.gimbal_state_machine == 2) != (gimbal_bridge.get_state_machine() == 2))
+    {
+        gimbal_bridge.set_state_machine(gimbal_cmd.gimbal_state_machine);
+        if (gimbal_cmd.gimbal_state_machine != 2)
+        {
+            gimbal_bridge.set_func_mode(FUNC_MODE_FPV);
+            ROS_INFO("Gimbal is set to FPV mode.");
+        }
+        else
+        {
+            gimbal_bridge.set_func_mode(FUNC_MODE_FOLLOW);
+            ROS_INFO("Gimbal is set to follow mode.");
+        }
+    }
+
+    if (gimbal_cmd.gimbal_state_machine == 0)
+    {
+        // 云台状态机为0时，云台指向前下方（pitch = -45， yaw=0）
+        ROS_INFO("Gimbal is set to point forward downwards (pitch=-45, yaw=0).");
+        gimbal_cmd.pitch = -45;
+        gimbal_cmd.yaw = 0;
+    }
+    else if (gimbal_cmd.gimbal_state_machine == 1)
+    {
+        // 云台状态机为1时，云台指向正下方（pitch=-90，yaw=0）
+        ROS_INFO("Gimbal is set to point directly downwards (pitch=-90, yaw=0).");
+        gimbal_cmd.pitch = -90;
+        gimbal_cmd.yaw = 0;
+    }
+    else
+    {
+        // 这里仅仅进行有效性判断，平滑性等更高层次的要求交给控制器进行处理。
+        if (gimbal_cmd.yaw < -135 || gimbal_cmd.yaw > 135 ||
+            gimbal_cmd.pitch < -90 || gimbal_cmd.pitch > 25)
+        {
+            ROS_ERROR("Invalid gimbal command: yaw or pitch out of range.");
+            return;
+        }
+    }
+    if (!gimbal_bridge.execute_command(gimbal_cmd))
     {
         ROS_ERROR("Failed to execute gimbal command.");
     }
@@ -244,7 +299,7 @@ int main(int argc, char **argv)
     std::cout << 1 << std::endl;
     gimbal_bridge.ping();
     std::cout << 2 << std::endl;
-    gimbal_bridge.set_func_mode();
+    gimbal_bridge.set_func_mode(FUNC_MODE_FPV);
     std::cout << 3 << std::endl;
     gimbal_bridge.request_gimbal_state();
     std::cout << 4 << std::endl;
