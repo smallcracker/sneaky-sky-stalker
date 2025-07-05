@@ -5,6 +5,7 @@
 cd ~
 git clone git@github.com:FranCOOlin/sneaky-sky-stalker.git
 cd ~/sneaky-sky-stalker
+catkin clean
 catkin build
 echo "source ~/sneaky-sky-stalker/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
