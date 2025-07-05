@@ -1,0 +1,22 @@
+gimbal_bridge_node
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/cmake.lock /home/fran/sneaky-sky-stalker/devel/./cmake.lock
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/lib/libgimbal_bridge_lib.so /home/fran/sneaky-sky-stalker/devel/lib/libgimbal_bridge_lib.so
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/lib/gimbal_bridge_node/gimbal_state_publisher /home/fran/sneaky-sky-stalker/devel/lib/gimbal_bridge_node/gimbal_state_publisher
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/lib/pkgconfig/gimbal_bridge_node.pc /home/fran/sneaky-sky-stalker/devel/lib/pkgconfig/gimbal_bridge_node.pc
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/lib/python3/dist-packages/gimbal_bridge_node/__init__.py /home/fran/sneaky-sky-stalker/devel/lib/python3/dist-packages/gimbal_bridge_node/__init__.py
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/lib/python3/dist-packages/gimbal_bridge_node/msg/_GimbalState.py /home/fran/sneaky-sky-stalker/devel/lib/python3/dist-packages/gimbal_bridge_node/msg/_GimbalState.py
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/lib/python3/dist-packages/gimbal_bridge_node/msg/__init__.py /home/fran/sneaky-sky-stalker/devel/lib/python3/dist-packages/gimbal_bridge_node/msg/__init__.py
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/gimbal_bridge_node/cmake/gimbal_bridge_node-msg-paths.cmake /home/fran/sneaky-sky-stalker/devel/share/gimbal_bridge_node/cmake/gimbal_bridge_node-msg-paths.cmake
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/gimbal_bridge_node/cmake/gimbal_bridge_nodeConfig.cmake /home/fran/sneaky-sky-stalker/devel/share/gimbal_bridge_node/cmake/gimbal_bridge_nodeConfig.cmake
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/gimbal_bridge_node/cmake/gimbal_bridge_nodeConfig-version.cmake /home/fran/sneaky-sky-stalker/devel/share/gimbal_bridge_node/cmake/gimbal_bridge_nodeConfig-version.cmake
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/gimbal_bridge_node/cmake/gimbal_bridge_node-msg-extras.cmake /home/fran/sneaky-sky-stalker/devel/share/gimbal_bridge_node/cmake/gimbal_bridge_node-msg-extras.cmake
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/common-lisp/ros/gimbal_bridge_node/msg/GimbalState.lisp /home/fran/sneaky-sky-stalker/devel/share/common-lisp/ros/gimbal_bridge_node/msg/GimbalState.lisp
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/common-lisp/ros/gimbal_bridge_node/msg/_package_GimbalState.lisp /home/fran/sneaky-sky-stalker/devel/share/common-lisp/ros/gimbal_bridge_node/msg/_package_GimbalState.lisp
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/common-lisp/ros/gimbal_bridge_node/msg/_package.lisp /home/fran/sneaky-sky-stalker/devel/share/common-lisp/ros/gimbal_bridge_node/msg/_package.lisp
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/common-lisp/ros/gimbal_bridge_node/msg/gimbal_bridge_node-msg.asd /home/fran/sneaky-sky-stalker/devel/share/common-lisp/ros/gimbal_bridge_node/msg/gimbal_bridge_node-msg.asd
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/roseus/ros/gimbal_bridge_node/manifest.l /home/fran/sneaky-sky-stalker/devel/share/roseus/ros/gimbal_bridge_node/manifest.l
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/roseus/ros/gimbal_bridge_node/msg/GimbalState.l /home/fran/sneaky-sky-stalker/devel/share/roseus/ros/gimbal_bridge_node/msg/GimbalState.l
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/gennodejs/ros/gimbal_bridge_node/_index.js /home/fran/sneaky-sky-stalker/devel/share/gennodejs/ros/gimbal_bridge_node/_index.js
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/gennodejs/ros/gimbal_bridge_node/msg/GimbalState.js /home/fran/sneaky-sky-stalker/devel/share/gennodejs/ros/gimbal_bridge_node/msg/GimbalState.js
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/share/gennodejs/ros/gimbal_bridge_node/msg/_index.js /home/fran/sneaky-sky-stalker/devel/share/gennodejs/ros/gimbal_bridge_node/msg/_index.js
+/home/fran/sneaky-sky-stalker/devel/.private/gimbal_bridge_node/include/gimbal_bridge_node/GimbalState.h /home/fran/sneaky-sky-stalker/devel/include/gimbal_bridge_node/GimbalState.h
