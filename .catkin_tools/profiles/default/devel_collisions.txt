@@ -1,2 +1,0 @@
-/home/fran/sneaky-sky-stalker/devel/./cmake.lock 4
-/home/ipac-ros-server/sneaky-sky-stalker/devel/./cmake.lock 2
