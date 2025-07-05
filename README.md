@@ -1,4 +1,6 @@
 # sneaky-sky-stalker
+## 0.依赖
+- ROS Noetic
 ## 1.配置ssh key
 首先在本地电脑配置ssh key,使得可以通过ssh key登录到github账户,这在clone仓库以及push代码的时候会有用
 ```shell
