@@ -8,18 +8,11 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <gimbal_bridge_node/siyi_zr10_protocol.h>
-#include <gimbal_bridge_node/GimbalState.h>
 #include <gimbal_bridge_node/GimbalCmd.h>
 
 constexpr int RECV_BUF_SIZE = 64;
 constexpr int SERVER_PORT = 37260;
 constexpr char SERVER_IP[] = "192.168.144.25";
-
-// 创建 Publisher，Topic 名字和消息类型
-ros::Publisher pub;
-
-// 创建 Subscriber，订阅云台控制指令
-ros::Subscriber sub;
 
 class gimbal_camera_state_bridge
 {
@@ -95,84 +88,6 @@ public:
         ROS_INFO("Zoom Firmware Version: %u", response.zoom_firmware_ver);
     }
 
-    void set_func_mode()
-    {
-        uint8_t send_buf[RECV_BUF_SIZE] = {0};
-        uint16_t request_length = siyi_pack_function_control(send_buf, RECV_BUF_SIZE, FUNC_MODE_FOLLOW, 0x0000);
-        if (request_length == 0)
-        {
-            ROS_ERROR("Failed to pack request data");
-            return;
-        }
-
-        // 发送数据
-        if (sendto(sockfd, send_buf, request_length, 0,
-                   (struct sockaddr *)&send_addr_, sizeof(send_addr_)) < 0)
-        {
-            ROS_ERROR("sendto failed: %s", strerror(errno));
-            close(sockfd);
-            return;
-        }
-    }
-
-    void request_gimbal_state()
-    {
-        // 定义请求数据
-        uint8_t send_buf[RECV_BUF_SIZE] = {0};
-        uint16_t request_length = siyi_pack_request_data_stream(send_buf, RECV_BUF_SIZE, 0x01, DATA_FREQ_50HZ, 0x0000);
-        if (request_length == 0)
-        {
-            ROS_ERROR("Failed to pack request data");
-            return;
-        }
-        ROS_INFO("Packed request data length: %d", request_length);
-
-        // 发送数据
-        if (sendto(sockfd, send_buf, request_length, 0,
-                   (struct sockaddr *)&send_addr_, sizeof(send_addr_)) < 0)
-        {
-            ROS_ERROR("sendto failed: %s", strerror(errno));
-            return;
-        }
-    }
-
-    bool receive_and_publish()
-    {
-        // 接收响应
-        struct sockaddr_in recv_addr;
-        socklen_t addr_len = sizeof(recv_addr);
-        unsigned char bag[RECV_BUF_SIZE] = {0};
-        int bag_len = recvfrom(sockfd, bag, RECV_BUF_SIZE, 0,
-                               (struct sockaddr *)&recv_addr, &addr_len);
-        if (bag_len < 0)
-        {
-            ROS_ERROR("recvfrom failed: %s", strerror(errno));
-            return false;
-        }
-
-        AttitudeDataResponse response;
-        // 解析响应
-        if (!siyi_unpack_attitude_data_response(bag, bag_len, &response))
-        {
-            ROS_ERROR("Failed to unpack response data");
-            ROS_INFO("Received data length: %d", bag_len);
-            ROS_INFO("Received data: ");
-            for (int i = 0; i < bag_len; ++i)
-            {
-                ROS_INFO("%02x ", bag[i]);
-            }
-            return false;
-        }
-        gimbal_bridge_node::GimbalState msg;
-        msg.yaw = static_cast<float>(response.yaw) / 10.0f;
-        msg.pitch = static_cast<float>(response.pitch) / 10.0f;
-        msg.roll = static_cast<float>(response.roll) / 10.0f;
-        msg.json_string = "{\"status\":\"normal\"}";
-        // 发布消息
-        pub.publish(msg);
-        return true;
-    }
-
     bool execute_command(const gimbal_bridge_node::GimbalCmd &cmd)
     {
         // 打包云台转向命令
@@ -231,31 +146,18 @@ void gimbal_cmd_callback(const gimbal_bridge_node::GimbalCmd::ConstPtr &msg)
 
 int main(int argc, char **argv)
 {
+
     // 初始化 ROS 节点
-    ros::init(argc, argv, "gimbal_state_publisher");
+    ros::init(argc, argv, "gimbal_command_subscriber");
     ros::NodeHandle nh;
-    pub = nh.advertise<gimbal_bridge_node::GimbalState>("/gimbal/state", 10);
-    sub = nh.subscribe("/gimbal/cmd", 3, gimbal_cmd_callback);
 
-    // 设置循环频率 (100Hz)
-    ros::Rate loop_rate(101);
-
-    // gimbal_camera_state_bridge gimbal_bridge(SERVER_IP, SERVER_PORT);
-    std::cout << 1 << std::endl;
+    // 测试 gimbal_bridge 连通性
     gimbal_bridge.ping();
-    std::cout << 2 << std::endl;
-    gimbal_bridge.set_func_mode();
-    std::cout << 3 << std::endl;
-    gimbal_bridge.request_gimbal_state();
-    std::cout << 4 << std::endl;
-    // ros::spin();
 
-    while (ros::ok())
-    {
-        ros::spinOnce(); // 处理 ROS 事件队列
-        gimbal_bridge.receive_and_publish();
-        loop_rate.sleep();
-    }
+    // 创建 Subscriber，订阅云台控制指令
+    ros::Subscriber sub = nh.subscribe("/gimbal/cmd", 1, gimbal_cmd_callback);
+
+    ros::spin();
 
     return 0;
 }
